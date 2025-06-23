@@ -3,12 +3,7 @@ from ReLu import relu
 from SoftMax import softmax
 import numpy as np
 import pandas as pd
-
-dataset = pd.read_csv('train.csv').to_numpy()
-
-X = dataset[:, 1:].T
-X = X/255.0
-y = dataset[:, 0]
+from convertToPixel import preProcessScreenShot
 
 network = [
     layer(784, 128),
@@ -23,15 +18,23 @@ network[0].bias = Weights["b1"]
 network[2].weights = Weights["W2"]
 network[2].bias = Weights["b2"]
 
-output = X
-for n in network:
-    output = n.forward(output)
 
-loss = network[3].crossEnt(output, y)
-predictions = np.argmax(output, axis=0)
-acc = np.mean(predictions == y)
+def inferenceModel(image):
+    output = image
+    for n in network:
+        output = n.forward(output)
 
-print("The current loss: ", loss)
-print(f"Accuracy: {acc:.4f}")
+    predictions = np.argmax(output, axis=0)
+    print(predictions)
 
-#next time we will use this model to do something fun :)
+
+def inferScreenShot():
+    image = preProcessScreenShot()
+    output = image
+    for n in network:
+        output = n.forward(output)
+
+    predictions = np.argmax(output, axis=0)
+    print("The screenshotted Image contains the Number: ", predictions)
+
+# next time we will use this model to do something fun :)

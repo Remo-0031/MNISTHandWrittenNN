@@ -7,7 +7,7 @@ import pandas as pd
 dataset = pd.read_csv('train.csv').to_numpy()
 
 X = dataset[:, 1:].T
-X = X/255.0
+X = X / 255.0
 y = dataset[:, 0]
 
 network = [
@@ -17,7 +17,12 @@ network = [
     softmax()
 ]
 
-for i in range(1500):
+Epoch_arr = []
+acc_arr = []
+Num_Epochs = 2000
+
+# Main training code ish
+for i in range(Num_Epochs):
     output = X
     for n in network:
         output = n.forward(output)
@@ -27,6 +32,8 @@ for i in range(1500):
     acc = np.mean(predictions == y)
 
     if i % 5 == 0:
+        Epoch_arr.append(i)
+        acc_arr.append(acc)
         print("This is epoch number: ", i)
         print("The current loss: ", loss)
         print(f"Accuracy: {acc:.4f}")
@@ -39,11 +46,16 @@ for i in range(1500):
     network[0].updateWeights()
     network[2].updateWeights()
 
-np.savez("BestModelWeights.npz",W1=network[0].weights,
+# Create a dataframe using the epochs as X and Accuracy as the Y that will be used for the visualization Later
+accuracy_per_5_epoch = pd.DataFrame({'x': Epoch_arr, 'y': acc_arr})
+print(accuracy_per_5_epoch)
+accuracy_per_5_epoch.to_csv("Visualization_Of_Training")
+
+# Save the weights acquired from training the model
+np.savez("BestModelWeights.npz", W1=network[0].weights,
          b1=network[0].bias,
          W2=network[2].weights,
          b2=network[2].bias)
-
 
 """
 # making the first layer (input 784, output 128)
